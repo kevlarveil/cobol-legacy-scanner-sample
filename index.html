@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COBOL Security Scanner | Legacy Banking System Protection</title>
+    <title>COBOL Security Scanner | Kevlar Veil | Legacy Banking System Protection</title>
     <meta name="description" content="Protect your bank's legacy COBOL systems. Professional security scanning for financial institutions. 40% of banks still run vulnerable COBOL code processing $3 trillion daily.">
     <meta name="keywords" content="COBOL security, banking security, legacy system scanning, mainframe security, financial security, PCI DSS compliance">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,8 +26,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                 </svg>
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">SecureBank COBOL</h1>
-                    <p class="text-sm text-gray-600">by Kevlar Veil</p>
+                    <h1 class="text-2xl font-bold text-gray-900">Kevlar Veil</h1>
+                    <p class="text-sm text-gray-600">COBOL Security Scanner</p>
                 </div>
             </div>
             <a href="https://calendly.com/kevlarveil/enterprise-cobol-complete-security-platform" target="_blank" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
@@ -110,7 +110,7 @@
 
             <!-- Email Gate -->
             <div id="emailGate" class="max-w-md mx-auto">
-                <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 text-center">
+                <form onsubmit="unlockScanner(event)" class="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 text-center">
                     <svg class="w-16 h-16 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
@@ -118,11 +118,13 @@
                     <input 
                         type="email" 
                         id="userEmail" 
+                        name="email"
+                        required
                         placeholder="Enter your work email"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <button 
-                        onclick="unlockScanner()"
+                        type="submit"
                         class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
                     >
                         Start Free Scanning
@@ -130,7 +132,7 @@
                     <p class="text-xs text-gray-600 mt-3">
                         We respect your privacy. No spam, just security insights.
                     </p>
-                </div>
+                </form>
             </div>
 
             <!-- Scanner Tool (Hidden Until Email) -->
@@ -251,8 +253,9 @@
     <!-- Footer -->
     <footer class="bg-gray-900 text-gray-400 py-8 mt-16">
         <div class="max-w-7xl mx-auto px-6 text-center">
-            <p>© 2024 Kevlar Veil | SecureBank COBOL Scanner</p>
-            <p class="mt-2">Protecting legacy banking systems from modern threats</p>
+            <p class="text-lg font-semibold text-white mb-2">Kevlar Veil</p>
+            <p>COBOL Security Scanner | Protecting legacy banking systems from modern threats</p>
+            <p class="mt-4">© 2024 Kevlar Veil. All rights reserved.</p>
         </div>
     </footer>
 
@@ -336,24 +339,52 @@
             document.getElementById('scanner').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function unlockScanner() {
+        function unlockScanner(event) {
+            event.preventDefault();
+            
             const email = document.getElementById('userEmail').value;
             if (!email || !email.includes('@')) {
                 alert('Please enter a valid email address');
                 return;
             }
 
-            // Store email and scan count
-            localStorage.setItem('userEmail', email);
-            localStorage.setItem('scansRemaining', '3');
+            // Send email to Formspree
+            fetch('https://formspree.io/f/xjknrpzb', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    _subject: 'New COBOL Scanner Lead',
+                    source: 'COBOL Landing Page'
+                })
+            }).then(response => {
+                if (response.ok) {
+                    // Store email and scan count locally
+                    localStorage.setItem('userEmail', email);
+                    localStorage.setItem('scansRemaining', '3');
 
-            // Show scanner
-            document.getElementById('emailGate').classList.add('hidden');
-            document.getElementById('scannerTool').classList.remove('hidden');
-            document.getElementById('displayEmail').textContent = email;
-            
-            // Load first sample
-            loadSample();
+                    // Show scanner
+                    document.getElementById('emailGate').classList.add('hidden');
+                    document.getElementById('scannerTool').classList.remove('hidden');
+                    document.getElementById('displayEmail').textContent = email;
+                    
+                    // Load first sample
+                    loadSample();
+                } else {
+                    alert('Error submitting email. Please try again.');
+                }
+            }).catch(error => {
+                console.error('Formspree error:', error);
+                // Still unlock even if Formspree fails (for better UX)
+                localStorage.setItem('userEmail', email);
+                localStorage.setItem('scansRemaining', '3');
+                document.getElementById('emailGate').classList.add('hidden');
+                document.getElementById('scannerTool').classList.remove('hidden');
+                document.getElementById('displayEmail').textContent = email;
+                loadSample();
+            });
         }
 
         function loadSample() {
